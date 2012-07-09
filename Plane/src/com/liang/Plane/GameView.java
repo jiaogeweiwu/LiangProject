@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -51,7 +52,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	
 	/**游戏路径数据*/
 	private List<Cell> gameDate = null;
-	
+	/**色子资源*/
+	private int seResource = R.drawable.s1;
+	/**是否正在滚动色子*/
+	private boolean seRocking = false;
 	
 	/**
 	 * 构造
@@ -92,26 +96,66 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		canvas.drawLine(0, aboveHeight, appDate.getScreenWidth(), aboveHeight, paint);
 		canvas.drawLine(belowLeftWidth, aboveHeight, belowLeftWidth, appDate.getScreenHeight(), paint);
 		
-		/**画路径*/
+		//画路径
 		Cell cell = null;
 		for(int i=0 ; i<gameDate.size() ; i++){
 			cell = gameDate.get(i);
-			
-			if(i%2==0)
-				paint.setColor(Color.GRAY);
-			else
-				paint.setColor(Color.CYAN);
-			
 			float x = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_X_KEY);
 			float y = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_Y_KEY);
-			canvas.drawRect(x, y, x + gameTypes.getCellWidth(), y + gameTypes.getCellHeight(),paint);
+			
+			if(i==0){//画起点
+				bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.start_pos);
+				tempBitmap = Bitmap.createScaledBitmap(bitmap,gameTypes.getCellWidth(), gameTypes.getCellHeight(),true);
+				bitmap.recycle();
+				canvas.drawBitmap(tempBitmap, x, y, paint);
+				tempBitmap.recycle();
+			}else if(i == (gameDate.size() -1)){//画终点
+				bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.end_pos);
+				tempBitmap = Bitmap.createScaledBitmap(bitmap,gameTypes.getCellWidth(), gameTypes.getCellHeight(),true);
+				bitmap.recycle();
+				canvas.drawBitmap(tempBitmap, x, y, paint);
+				tempBitmap.recycle();
+			}else{ //画中间点
+				
+				if(i%2 == 0){
+					bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.go_pos);
+				}else{
+					bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.back_pos);
+				}
+				tempBitmap = Bitmap.createScaledBitmap(bitmap,gameTypes.getCellWidth(), gameTypes.getCellHeight(),true);
+				bitmap.recycle();
+				canvas.drawBitmap(tempBitmap, x, y, paint);
+				tempBitmap.recycle();
+			}
 			
 			paint.setColor(Color.RED);
 			canvas.drawText(String.valueOf(i+1), x, y+10, paint);
+			
 		}
 		
+		//画角色一
+		cell = gameDate.get(0);
+		float x = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_X_KEY);
+		float y = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_Y_KEY);
+		bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.head1);
+		tempBitmap = Bitmap.createScaledBitmap(bitmap,gameTypes.getCellWidth()/2, gameTypes.getCellHeight()/2,true);
+		bitmap.recycle();
+		canvas.drawBitmap(tempBitmap, x+gameTypes.getCellWidth()/4, y, paint);
+		tempBitmap.recycle();
+		
+		//画角色二
+		cell = gameDate.get(0);
+		x = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_X_KEY);
+		y = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_Y_KEY);
+		bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.head2);
+		tempBitmap = Bitmap.createScaledBitmap(bitmap,gameTypes.getCellWidth()/2, gameTypes.getCellHeight()/2,true);
+		bitmap.recycle();
+		canvas.drawBitmap(tempBitmap, x+gameTypes.getCellWidth()/4, y+gameTypes.getCellHeight()/2, paint);
+		tempBitmap.recycle();
+		
+		
 		//画色子
-		bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.s1);
+		bitmap = BitmapFactory.decodeResource(context.getResources(), seResource);
 		tempBitmap = Bitmap.createScaledBitmap(bitmap,50,50,true);
 		bitmap.recycle();
 		canvas.drawBitmap(tempBitmap,
@@ -121,7 +165,27 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		tempBitmap.recycle();
 		
 		//画我的状态
-		canvas.drawText("我我我：21  <==> 对手的:5",5 , aboveHeight+5+10, paint);
+		cell = gameDate.get(0);
+		x = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_X_KEY);
+		y = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_Y_KEY);
+		bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.head1);
+		tempBitmap = Bitmap.createScaledBitmap(bitmap,gameTypes.getCellWidth()/4, gameTypes.getCellHeight()/4,true);
+		bitmap.recycle();
+		canvas.drawBitmap(tempBitmap, 5,aboveHeight+5, paint);
+		canvas.drawText(":21  <==>",5+tempBitmap.getWidth() , aboveHeight+5+10, paint);
+		tempBitmap.recycle();
+		
+		//画我对手状态
+		cell = gameDate.get(0);
+		x = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_X_KEY);
+		y = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_Y_KEY);
+		bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.head2);
+		tempBitmap = Bitmap.createScaledBitmap(bitmap,gameTypes.getCellWidth()/4, gameTypes.getCellHeight()/4,true);
+		bitmap.recycle();
+		canvas.drawBitmap(tempBitmap, 5+tempBitmap.getWidth()+60,aboveHeight+5, paint);
+		canvas.drawText(":5",5+tempBitmap.getWidth()+60+tempBitmap.getWidth() , aboveHeight+5+10, paint);
+		tempBitmap.recycle();
+		
 		
 		//画提示
 		canvas.drawText("遇到狼，退一步",5 , aboveHeight+5+10+20, paint);
@@ -138,9 +202,73 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		
 	}
 	
+	/**滚动色子线程*/
+	private class SeRock extends Thread{
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			super.run();
+			int times = 1;
+			int sleepSpec = 10;//休眠间隔
+			for(int i=0 ; i<10 ; i++){
+				try{
+					seRocking = true;
+					if(times == 1){
+						seResource = R.drawable.s1;
+					}else if(times == 2){
+						seResource = R.drawable.s2;
+					}else if(times == 3){
+						seResource = R.drawable.s3;
+					}else if(times == 4){
+						seResource = R.drawable.s4;
+					}else if(times == 5){
+						seResource = R.drawable.s5;
+					}else if(times == 6){
+						seResource = R.drawable.s6;
+					}
+					
+					times++;
+					times = times>6?1:times;
+					drawGame();//开始绘制
+					sleep(sleepSpec);
+				}catch (Exception e) {
+					// TODO: handle exception
+					e.printStackTrace();
+				}
+				seRocking = false;
+			}
+		}
+		
+	}
 	
+	/**
+	 * 据点击的范围，判断点击事件
+	 * @param actionX x点
+	 * @param actionY y点
+	 */
+	public void touchHandler(float actionX,float actionY){
+		
+		if(actionX > belowLeftWidth && actionY > aboveHeight){//点击了色子区域
+			if(!seRocking)
+				new SeRock().start();
+			System.out.println("点击了色子区域...");
+		}
+	}
 	
-	
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		// TODO Auto-generated method stub
+		
+		if(event.getAction() == MotionEvent.ACTION_UP){
+			float actionX = event.getX();
+			float actionY = event.getY();
+			touchHandler(actionX, actionY);
+			System.out.println("点中:..."+actionX+":"+actionY);
+		}
+		
+		return true;
+	}
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
