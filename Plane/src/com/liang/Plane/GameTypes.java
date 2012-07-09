@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.liang.Plane.GlobleTypes.Types;
+import static com.liang.Plane.GlobleTypes.CELL_LIST_X_KEY;
+import static com.liang.Plane.GlobleTypes.CELL_LIST_Y_KEY;
+
 /**
  * 飞行棋--游戏关卡数据
  * @author 梁进劲
@@ -26,32 +30,14 @@ public class GameTypes {
 	/**居中需要对上偏移的像素数*/
 	private int alignCenterTop = 0;
 	
-	/**cellList的单元格x坐标键*/
-	public final String CELL_LIST_X_KEY = "x";
-	/**cellList的单元格y坐标键*/
-	public final String CELL_LIST_Y_KEY = "y";
 	/**
 	 * 单元格数据，以数组&quot;下标&quot;为编号，记录当单元格的起始点。<br/>
 	 * CELL_LIST_X_KEY :x坐标<br/>CELL_LIST_Y_KEY:y坐标
 	 */
 	private List<Map<String,Integer>> cellList = null;
 	
-	/**单元格编号，对应cellList的下标*/
-	public final String GAME_DATE_ID = "id";
-	/**单元格描述，自定义时不起过20字*/
-	public final String GAME_DATE_DESC = "desc";
-	/**前进步数*/
-	public final String GAME_DATE_GO_STEP = "gostep";
-	/**前进类型:go\back\pause*/
-	public final String GAME_DATE_TYPE = "type";
-	
-	/**
-	 *游戏路径数据<br/>
-	 *
-	 */
-	public List<Map<String,String>> gameDate = null;
-	
-	
+	/**游戏路径数据*/
+	private List<Cell> gameDate = null;
 	
 	/**
 	 * 构造
@@ -81,11 +67,44 @@ public class GameTypes {
 	}
 	
 	/**
-	 * 获取游戏类型数据
+	 * 获取游戏路径数据
+	 * @return List<Cell> 路径数据
 	 */
-	public void getGameByType(){
+	public List<Cell> getGameByType(){
 		
-		gameDate
+		//*************横向顺逆顺分配 start*********************
+		gameDate = new ArrayList<Cell>();
+		Cell cell = null;
+		boolean isRound = true;//当前是否为顺时针排列
+		for(int i=0 ; i<rows ; i++){ 
+			
+			if((i+1)%2 == 0){ //2、4、6、8、10......行
+				if(isRound){//顺时针，则下一轮将变为逆时针，加上本行最后一个格
+					cell = new Cell(i*cells+cells-1, "描述:前进", 1, Types.TYPE_FORWARD);
+					gameDate.add(gameDate.size(),cell);
+					isRound = false;
+				}else{//逆时针，则下一轮将变为顺时针,加上本行第一个格
+					cell = new Cell(i*cells, "描述:前进", 1, Types.TYPE_FORWARD);
+					gameDate.add(gameDate.size(),cell);
+					isRound = true;
+				}
+			}else{
+				for(int k=0 ; k<cells ; k++){//1、3、5、7...行
+					if(isRound){//顺时针排列
+						cell = new Cell(i*cells + k, "描述:前进", 1,Types.TYPE_FORWARD);
+						gameDate.add(gameDate.size(),cell);
+					}else{//逆时针排列
+						cell = new Cell(i*cells + cells - k -1, "描述:前进", 1, Types.TYPE_FORWARD);
+						gameDate.add(gameDate.size(),cell);
+					}
+					
+				}
+			}
+			
+		}
+		//*************横向顺逆顺分配 end*********************
+		
+		return gameDate;
 	}
 
 	/**单元格的长度*/
@@ -112,5 +131,6 @@ public class GameTypes {
 	public List<Map<String, Integer>> getCellList() {
 		return cellList;
 	}
+	
 	
 }

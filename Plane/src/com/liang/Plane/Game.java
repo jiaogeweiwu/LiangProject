@@ -36,7 +36,6 @@ public class Game extends Activity {
 		// TODO Auto-generated method stub
 		super.onResume();
 		//开始相关绘制
-		
 	}
 	
 	
