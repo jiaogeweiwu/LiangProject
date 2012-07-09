@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center_horizontal"
+    android:background="@drawable/main_bg">
+    <!-- 游戏名 -->
+	<TextView  
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content"
+	    android:textSize="45sp"
+	    android:layout_marginTop="30dip"
+	    android:text="飞行棋"
+	    android:textColor="#B83968" />
+    
+    <LinearLayout 
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:orientation="vertical"
+    	android:gravity="center">
+    	 <!-- 快速开始 -->
+		<TextView  
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content"
+		    android:textSize="25sp"
+		    android:text="快速开始"
+		    android:textColor="#B83968"
+		    android:id="@+id/main_quick_start" />
+		    
+		    <!-- 继续游戏 -->
+		<TextView  
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content"
+		    android:textSize="25sp"
+		    android:text="继续游戏"
+		    android:textColor="#B83968"
+		    android:id="@+id/main_goon" />
+    
+    <!-- 选择关卡 -->
+		<TextView  
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content"
+		    android:textSize="25sp"
+		    android:text="选择关卡"
+		    android:textColor="#B83968"
+		    android:id="@+id/main_select" />
+    
+    <!-- 自创游戏 -->
+		<TextView  
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content"
+		    android:textSize="25sp"
+		    android:text="自创游戏"
+		    android:textColor="#B83968"
+		    android:id="@+id/main_define" />
+	
+	<!-- 设置 -->
+		<TextView  
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content"
+		    android:textSize="25sp"
+		    android:text="设置"
+		    android:textColor="#B83968"
+		    android:id="@+id/main_setting" />
+    
+    <!-- 关于 -->
+		<TextView  
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content"
+		    android:textSize="25sp"
+		    android:text="关于"
+		    android:textColor="#B83968"
+		    android:id="@+id/main_about" />
+    </LinearLayout>
+</LinearLayout>
