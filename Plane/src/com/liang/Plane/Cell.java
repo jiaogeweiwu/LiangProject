@@ -17,7 +17,7 @@ public class Cell {
 	/**前进步数*/
 	private int gostep = 0;
 	
-	/**类型 TYPE_BACK,TYPE_PAUSE,TYPE_FORWARD*/
+	/**类型 TYPE_BACK,TYPE_PAUSE,TYPE_FORWARD,TYPE_NON*/
 	private Types type = null;
 	
 	/**
@@ -25,7 +25,7 @@ public class Cell {
 	 * @param id 单元格编号，对应cellList的下标
 	 * @param desc 单元格描述，自定义时不起过20字
 	 * @param gostep 前进步数
-	 * @param type 类型 TYPE_BACK,TYPE_PAUSE,TYPE_FORWARD
+	 * @param type 类型 TYPE_BACK,TYPE_PAUSE,TYPE_FORWARD,TYPE_NON
 	 */
 	public Cell(int id, String desc,int gostep,Types type){
 		this.setId(id);

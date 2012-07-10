@@ -61,6 +61,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	/**终点下标*/
 	private int endPosition = 0;
 	
+	/**当前为我摇色子*/
+	private final int CURRENT_MY_ROCK = 0;
+	/**当前为对手摇色子*/
+	private final int CURRENT_OP_ROCK = 1;
+	/**当前应为谁摇色子*/
+	private int current_rock = CURRENT_MY_ROCK;
+	
 	
 	/**
 	 * 构造
@@ -125,8 +132,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 					bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.go_pos);
 				}else if(cell.getType() == Types.TYPE_BACK){//后退
 					bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.back_pos);
-				}else{//暂停
+				}else if(cell.getType() == Types.TYPE_PAUSE){//暂停
 					bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.pause_pos);
+				}else{//没事
+					bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.free_pos);
 				}
 				tempBitmap = Bitmap.createScaledBitmap(bitmap,gameTypes.getCellWidth(), gameTypes.getCellHeight(),true);
 				bitmap.recycle();
@@ -172,7 +181,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		tempBitmap.recycle();
 		
 		//画我的状态
-		cell = gameDate.get(0);
+		cell = gameDate.get(myPosition);
 		x = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_X_KEY);
 		y = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_Y_KEY);
 		bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.head1);
@@ -183,7 +192,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		tempBitmap.recycle();
 		
 		//画我对手状态
-		cell = gameDate.get(0);
+		cell = gameDate.get(opPosition);
 		x = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_X_KEY);
 		y = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_Y_KEY);
 		bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.head2);
@@ -222,22 +231,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	/**滚动色子线程*/
 	private class SeRock extends Thread{
 		
+		/**单元格数据*/
+		private Cell cell = null;
+		
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
 			super.run();
 			int times = 1;
-			int sleepSpec = 500;//休眠间隔
-			int MAX_TIME = 5; //最大循环次数
+			int sleepSpec = 300;//休眠间隔
+			int MAX_TIME = 2; //最大循环次数
 			for(int i=0 ; i<MAX_TIME ; i++){
 				try{
 					seRocking = true;
 					
 					times = (int)System.currentTimeMillis()%6 + 1;
-					
-					System.out.println("随机处理中.先.."+times);
 					times = times>6?1:times;
-					System.out.println("随机处理中.后.."+times);
 					
 					if(times == 1){
 						seResource = R.drawable.s1;
@@ -253,9 +262,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 						seResource = R.drawable.s6;
 					}
 					
-					if(i == (MAX_TIME-1)){
-						System.out.println("最后结果..."+times);
-					}
 					
 					new DrawThread().start();
 					sleep(sleepSpec);
@@ -265,6 +271,75 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 				}
 				seRocking = false;
 			}
+			System.out.println("最后色子结果..."+times);
+			
+			
+			
+			if(current_rock == CURRENT_MY_ROCK){ //为我计算结果
+				myPosition +=times;
+				
+				//潜在算法危险，如果两个格死跳，那将造成卡机。
+				while(true){
+					if(myPosition >= endPosition){ //到达终点
+						myPosition = endPosition;
+						System.out.println("我胜出...");
+						break;
+					}
+					cell = gameDate.get(myPosition);
+					if(cell.getType() == Types.TYPE_FORWARD){//向前
+						myPosition += cell.getGostep();
+						System.out.println(cell.getDesc()+":"+cell.getGostep());
+					}else if(cell.getType() == Types.TYPE_BACK){//向后
+						myPosition -= cell.getGostep();
+						System.out.println(cell.getDesc()+":"+cell.getGostep());
+						if(myPosition <= 0){
+							myPosition = 0;
+							System.out.println("回到了起点...");
+							break;
+						}
+					}else if(cell.getType() == Types.TYPE_PAUSE){//暂停一次
+						System.out.println(cell.getDesc()+":"+cell.getGostep());
+						break;
+					}else{ //没事 起点 终点
+						break;
+					}
+				}
+				
+				
+			}else{//为对手计算结果
+				opPosition +=times;
+				
+				//潜在算法危险，如果两个格死跳，那将造成卡机。
+				while(true){
+					if(opPosition >= endPosition){ //到达终点
+						opPosition = endPosition;
+						System.out.println("对手胜出...");
+						break;
+					}
+					cell = gameDate.get(opPosition);
+					if(cell.getType() == Types.TYPE_FORWARD){//向前
+						opPosition += cell.getGostep();
+						System.out.println(cell.getDesc()+":对手"+cell.getGostep());
+					}else if(cell.getType() == Types.TYPE_BACK){//向后
+						opPosition -= cell.getGostep();
+						System.out.println(cell.getDesc()+":对手"+cell.getGostep());
+						if(opPosition <= 0){
+							opPosition = 0;
+							System.out.println("对手回到了起点...");
+							break;
+						}
+					}else if(cell.getType() == Types.TYPE_PAUSE){//暂停一次
+						System.out.println(cell.getDesc()+":对手"+cell.getGostep());
+						break;
+					}else{ //没事 起点 终点
+						break;
+					}
+				}
+				
+				new DrawThread().start();
+			}
+			
+			
 		}
 		
 	}

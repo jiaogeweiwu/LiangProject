@@ -23,6 +23,9 @@ public class TipDates {
 	public static String TYPE_BEGIN_TIP = "begin";
 	/**tips key,胜利*/
 	public static String TYPE_END_TIP = "end";
+	/**tips key,没有事*/
+	public static String TYPE_NON_TIP = "nothing";
+	
 	
 	/**
 	 * 游戏提示数据
@@ -70,6 +73,12 @@ public class TipDates {
 							};
 		tempMap.put(TYPE_BACK_TIP, backTips);
 		
+		//没事提示组
+				String[] nonTips = {
+										"没啥事"
+									};
+				tempMap.put(TYPE_NON_TIP, nonTips);
+		
 		//**********追女孩 end**********
 		
 		tips.add(tempMap);
@@ -82,7 +91,9 @@ public class TipDates {
 	 * TYPE_BACK_TIP<br/>   
 	 * TYPE_PAUSE_TIP<br/>   
 	 * TYPE_BEGIN_TIP<br/>  
-	 * TYPE_END_TIP
+	 * TYPE_END_TIP<br/>
+	 * TYPE_BACK_TIP<br/>
+	 * TYPE_NON_TIP
 	 * @return 提示组
 	 */
 	public Map<String,String[]> getTip(){

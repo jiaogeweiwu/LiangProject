@@ -87,24 +87,30 @@ public class GameTypes {
 		int backTipSize = tips.get(TipDates.TYPE_BACK_TIP).length;
 		/**暂停提示数*/
 		int pauseTipSize = tips.get(TipDates.TYPE_PAUSE_TIP).length;
+		/**没事提示数*/
+		int nonTipSize = tips.get(TipDates.TYPE_NON_TIP).length;
 		//已用到提示的下标
 		int goIndex = 0;
 		int backIndex = 0;
 		int pauseIndex = 0;
+		int nonIndex = 0;
 		
 		Types currentType = null;
 		for(int i=0 ; i<rows ; i++){ 
 			
 			//随机会配类型
-			switch((int)((System.currentTimeMillis()+i)%3)){
+			switch((int)((System.currentTimeMillis()+i)%10)){
 				case 0://向前
 					currentType = Types.TYPE_FORWARD;
 					break;
 				case 1://后退
 					currentType = Types.TYPE_BACK;
 					break;
-				default://暂停
+				case 2://暂停
 					currentType = Types.TYPE_PAUSE;
+					break;
+				default://没事
+					currentType = Types.TYPE_NON;
 					break;
 			}
 			
@@ -126,26 +132,34 @@ public class GameTypes {
 					cell.setDesc(tips.get(TipDates.TYPE_BACK_TIP)[backIndex]);
 					backIndex++;
 					backIndex = backIndex<backTipSize?backIndex:0;
-				}else{
+				}else if(currentType == Types.TYPE_PAUSE){
 					cell.setGostep(0);
 					cell.setDesc(tips.get(TipDates.TYPE_PAUSE_TIP)[pauseIndex]);
 					pauseIndex++;
 					pauseIndex = pauseIndex<pauseTipSize?pauseIndex:0;
+				}else{
+					cell.setGostep(0);
+					cell.setDesc(tips.get(TipDates.TYPE_NON_TIP)[nonIndex]);
+					nonIndex++;
+					nonIndex = nonIndex<nonTipSize?nonIndex:0;
 				}
 				gameDate.add(gameDate.size(),cell);
 			}else{
 				for(int k=0 ; k<cells ; k++){//1、3、5、7...行
 					
 					//随机会配类型
-					switch((int)((System.currentTimeMillis()+k)%3)){
+					switch((int)((System.currentTimeMillis()+i)%10)){
 						case 0://向前
 							currentType = Types.TYPE_FORWARD;
 							break;
 						case 1://后退
 							currentType = Types.TYPE_BACK;
 							break;
-						default://暂停
+						case 2://暂停
 							currentType = Types.TYPE_PAUSE;
+							break;
+						default://没事
+							currentType = Types.TYPE_NON;
 							break;
 					}
 					
@@ -163,12 +177,18 @@ public class GameTypes {
 						cell.setDesc(tips.get(TipDates.TYPE_BACK_TIP)[backIndex]);
 						backIndex++;
 						backIndex = backIndex<backTipSize?backIndex:0;
-					}else{
+					}else if(currentType == Types.TYPE_PAUSE){
 						cell.setGostep(0);
 						cell.setDesc(tips.get(TipDates.TYPE_PAUSE_TIP)[pauseIndex]);
 						pauseIndex++;
 						pauseIndex = pauseIndex<pauseTipSize?pauseIndex:0;
+					}else{
+						cell.setGostep(0);
+						cell.setDesc(tips.get(TipDates.TYPE_NON_TIP)[nonIndex]);
+						nonIndex++;
+						nonIndex = nonIndex<nonTipSize?nonIndex:0;
 					}
+					
 					gameDate.add(gameDate.size(),cell);
 					
 					

@@ -13,8 +13,9 @@ public class GlobleTypes {
 	 *  TYPE_BACK:退格<br/>
 	 *  TYPE_PAUSE:暂停一次<br/>
 	 *  TYPE_FORWARD:前进<br/>
+	 *  TYPE_NON:没什么事
 	 */
-	public static enum Types{TYPE_BEGIN,TYPE_END,TYPE_BACK,TYPE_PAUSE,TYPE_FORWARD};
+	public static enum Types{TYPE_BEGIN,TYPE_END,TYPE_BACK,TYPE_PAUSE,TYPE_FORWARD,TYPE_NON};
 	
 	/** GameTypes.cellList的单元格x坐标键*/
 	public static final String CELL_LIST_X_KEY = "x";
