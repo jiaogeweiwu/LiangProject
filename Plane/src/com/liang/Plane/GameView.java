@@ -68,6 +68,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	/**当前应为谁摇色子*/
 	private int current_rock = CURRENT_MY_ROCK;
 	
+	/**我是否暂停*/
+	private boolean myIsPause = false;
+	/**对手是否暂停*/
+	private boolean opIsPause = false;
+	
 	
 	/**
 	 * 构造
@@ -298,14 +303,35 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 							break;
 						}
 					}else if(cell.getType() == Types.TYPE_PAUSE){//暂停一次
+						myIsPause = true;
 						System.out.println(cell.getDesc()+":"+cell.getGostep());
 						break;
-					}else{ //没事 起点 终点
+					}else if(cell.getType() == Types.TYPE_NON){//没事
+						System.out.println("没事.AA..");
+						break;
+					}else if(cell.getType() == Types.TYPE_BEGIN){//起点
+						System.out.println("回到了起点.AA..");
+						break;
+					}else if(cell.getType() == Types.TYPE_END){//终点
+						System.out.println("我胜出.AA..");
+						break;
+					}else{//异常类型
 						break;
 					}
+
 				}
 				
-				
+				if(opIsPause){//对手暂停一次
+					current_rock = CURRENT_MY_ROCK;
+					myIsPause = false;
+					opIsPause = false;
+				}else{//下一个轮到对手
+					current_rock = CURRENT_OP_ROCK;
+					myIsPause = false;
+					opIsPause = false;
+					if(myPosition < endPosition)
+						new SeRock().start(); //对手自动摇色
+				}
 			}else{//为对手计算结果
 				opPosition +=times;
 				
@@ -331,14 +357,33 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 					}else if(cell.getType() == Types.TYPE_PAUSE){//暂停一次
 						System.out.println(cell.getDesc()+":对手"+cell.getGostep());
 						break;
-					}else{ //没事 起点 终点
+					}else if(cell.getType() == Types.TYPE_NON){//没事
+						System.out.println("没事.BB..");
+						break;
+					}else if(cell.getType() == Types.TYPE_BEGIN){//起点
+						System.out.println("回到了起点.BB..");
+						break;
+					}else if(cell.getType() == Types.TYPE_END){//终点
+						System.out.println("我胜出.BB..");
+						break;
+					}else{//异常类型
 						break;
 					}
 				}
 				
-				new DrawThread().start();
+				if(myIsPause){//我暂停一次
+					current_rock = CURRENT_OP_ROCK;
+					myIsPause = false;
+					opIsPause = false;
+					new SeRock().start(); //对手自动摇色
+				}else{//下一个轮到对手
+					current_rock = CURRENT_MY_ROCK;
+					myIsPause = false;
+					opIsPause = false;
+				}
 			}
 			
+			new DrawThread().start();
 			
 		}
 		
