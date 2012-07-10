@@ -3,6 +3,8 @@ package com.liang.Plane;
 import java.util.List;
 import java.util.Map;
 
+import com.liang.Plane.GlobleTypes.Types;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,18 +30,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	private Context context = null;
 	
 	private Paint paint = null;
-	/**工具类*/
-//	private Utils utils = null;
 	
 	//布局数据
 	/**上面游戏界面高度 08%*/
 	private int aboveHeight = 0; 
 	/**下面相关选项高度 screenHeight - aboveHeight*/
-//	private int belowHeight = 0;
 	/**下面左边选框宽度 60%*/
 	private int belowLeftWidth = 0;
 	/**下面右边框宽度 screenWidth - belowLeftWidth*/
-//	private int belowRightWidth = 0;
 	
 	
 	/**关卡类*/
@@ -56,6 +54,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	private int seResource = R.drawable.s1;
 	/**是否正在滚动色子*/
 	private boolean seRocking = false;
+	/**我的位置0开始*/
+	private int myPosition = 0;
+	/**对手位置0开始**/
+	private int opPosition = 0;
+	/**终点下标*/
+	private int endPosition = 0;
+	
 	
 	/**
 	 * 构造
@@ -75,7 +80,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		paint.setColor(Color.CYAN);
 		paint.setStrokeWidth(5f);
 		
-//		utils = new Utils();
 	}
 	
 	/**开始绘制*/
@@ -117,10 +121,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 				tempBitmap.recycle();
 			}else{ //画中间点
 				
-				if(i%2 == 0){
+				if(cell.getType() == Types.TYPE_FORWARD){//前进
 					bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.go_pos);
-				}else{
+				}else if(cell.getType() == Types.TYPE_BACK){//后退
 					bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.back_pos);
+				}else{//暂停
+					bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.pause_pos);
 				}
 				tempBitmap = Bitmap.createScaledBitmap(bitmap,gameTypes.getCellWidth(), gameTypes.getCellHeight(),true);
 				bitmap.recycle();
@@ -133,8 +139,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 			
 		}
 		
+		
 		//画角色一
-		cell = gameDate.get(0);
+		cell = gameDate.get(myPosition);
 		float x = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_X_KEY);
 		float y = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_Y_KEY);
 		bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.head1);
@@ -144,7 +151,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		tempBitmap.recycle();
 		
 		//画角色二
-		cell = gameDate.get(0);
+		cell = gameDate.get(opPosition);
 		x = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_X_KEY);
 		y = cellList.get(cell.getId()).get(GlobleTypes.CELL_LIST_Y_KEY);
 		bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.head2);
@@ -202,6 +209,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		
 	}
 	
+	/**画画主线程*/
+	private class DrawThread extends Thread{
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			super.run();
+			drawGame();
+		}
+	}
+	
 	/**滚动色子线程*/
 	private class SeRock extends Thread{
 		
@@ -210,10 +227,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 			// TODO Auto-generated method stub
 			super.run();
 			int times = 1;
-			int sleepSpec = 10;//休眠间隔
-			for(int i=0 ; i<10 ; i++){
+			int sleepSpec = 500;//休眠间隔
+			int MAX_TIME = 5; //最大循环次数
+			for(int i=0 ; i<MAX_TIME ; i++){
 				try{
 					seRocking = true;
+					
+					times = (int)System.currentTimeMillis()%6 + 1;
+					
+					System.out.println("随机处理中.先.."+times);
+					times = times>6?1:times;
+					System.out.println("随机处理中.后.."+times);
+					
 					if(times == 1){
 						seResource = R.drawable.s1;
 					}else if(times == 2){
@@ -228,9 +253,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 						seResource = R.drawable.s6;
 					}
 					
-					times++;
-					times = times>6?1:times;
-					drawGame();//开始绘制
+					if(i == (MAX_TIME-1)){
+						System.out.println("最后结果..."+times);
+					}
+					
+					new DrawThread().start();
 					sleep(sleepSpec);
 				}catch (Exception e) {
 					// TODO: handle exception
@@ -279,15 +306,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		appDate.setScreenHeight(height);
 		
 		aboveHeight = (int)(height * 0.8D);
-//		belowHeight = height - aboveHeight;
 		belowLeftWidth = (int)(width * 0.6D);
-//		belowRightWidth = width - belowLeftWidth;
 		
 		gameTypes = new GameTypes(width, aboveHeight);
 		cellList = gameTypes.getCellList();//获取所有格数据
 		gameDate= gameTypes.getGameByType();
 		
-		drawGame();//开始绘制
+		endPosition = gameDate.size() - 1;
+		endPosition = endPosition>0?endPosition:0;
+		
+		new DrawThread().start();
 	}
 
 	@Override

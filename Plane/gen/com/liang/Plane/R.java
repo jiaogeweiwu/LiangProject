@@ -19,13 +19,14 @@ public final class R {
         public static final int head2=0x7f020005;
         public static final int icon=0x7f020006;
         public static final int main_bg=0x7f020007;
-        public static final int s1=0x7f020008;
-        public static final int s2=0x7f020009;
-        public static final int s3=0x7f02000a;
-        public static final int s4=0x7f02000b;
-        public static final int s5=0x7f02000c;
-        public static final int s6=0x7f02000d;
-        public static final int start_pos=0x7f02000e;
+        public static final int pause_pos=0x7f020008;
+        public static final int s1=0x7f020009;
+        public static final int s2=0x7f02000a;
+        public static final int s3=0x7f02000b;
+        public static final int s4=0x7f02000c;
+        public static final int s5=0x7f02000d;
+        public static final int s6=0x7f02000e;
+        public static final int start_pos=0x7f02000f;
     }
     public static final class id {
         public static final int main_about=0x7f060005;
