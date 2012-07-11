@@ -19,11 +19,11 @@ public class PlaneActivity extends Activity implements OnClickListener{
 	/**View 继续游戏*/
 	private View vGoon = null;
 	/**View 选择关卡*/
-	private View vSelect = null;
+//	private View vSelect = null;
 	/**View 自创游戏*/
-	private View vDefine = null;
+//	private View vDefine = null;
 	/**View 设置*/
-	private View vSetting = null;
+//	private View vSetting = null;
 	/**View 关于*/
 	private View vAbout = null;
 	
@@ -39,14 +39,14 @@ public class PlaneActivity extends Activity implements OnClickListener{
         vGoon = this.findViewById(R.id.main_goon);
         vGoon.setOnClickListener(this);
         
-        vSelect = this.findViewById(R.id.main_select);
-        vSelect.setOnClickListener(this);
-        
-        vDefine = this.findViewById(R.id.main_define);
-        vDefine.setOnClickListener(this);
-        
-        vSetting = this.findViewById(R.id.main_setting);
-        vSetting.setOnClickListener(this);
+//        vSelect = this.findViewById(R.id.main_select);
+//        vSelect.setOnClickListener(this);
+//        
+//        vDefine = this.findViewById(R.id.main_define);
+//        vDefine.setOnClickListener(this);
+//        
+//        vSetting = this.findViewById(R.id.main_setting);
+//        vSetting.setOnClickListener(this);
         
         vAbout = this.findViewById(R.id.main_about);
         vAbout.setOnClickListener(this);
@@ -67,15 +67,15 @@ public class PlaneActivity extends Activity implements OnClickListener{
 			case R.id.main_goon://继续游戏
 				
 				break;
-			case R.id.main_select://选择关卡
-				
-				break;
-			case R.id.main_define://自创关卡
-				
-				break;
-			case R.id.main_setting://设置
-				
-				break;
+//			case R.id.main_select://选择关卡
+//				
+//				break;
+//			case R.id.main_define://自创关卡
+//				
+//				break;
+//			case R.id.main_setting://设置
+//				
+//				break;
 			case R.id.main_about://关于
 				
 				break;

@@ -30,12 +30,9 @@ public final class R {
         public static final int start_pos=0x7f020010;
     }
     public static final class id {
-        public static final int main_about=0x7f060005;
-        public static final int main_define=0x7f060003;
+        public static final int main_about=0x7f060002;
         public static final int main_goon=0x7f060001;
         public static final int main_quick_start=0x7f060000;
-        public static final int main_select=0x7f060002;
-        public static final int main_setting=0x7f060004;
     }
     public static final class layout {
         public static final int main=0x7f030000;
