@@ -1,5 +1,6 @@
 package com.liang.Plane;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,10 +36,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	/**上面游戏界面高度 08%*/
 	private int aboveHeight = 0; 
 	/**下面相关选项高度 screenHeight - aboveHeight*/
+	private int belowHeight = 0;
 	/**下面左边选框宽度 60%*/
 	private int belowLeftWidth = 0;
 	/**下面右边框宽度 screenWidth - belowLeftWidth*/
-	
+	private int belowRightWidth = 0;
 	
 	/**关卡类*/
 	private GameTypes gameTypes = null;
@@ -73,6 +75,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	/**对手是否暂停*/
 	private boolean opIsPause = false;
 	
+	/**可容纳的提示的数量*/
+	private int allowTipRows = 0;
+	/**提示消息队列，手控最多为allowTipRows行*/
+	private List<String> tipQueue = null;
+	
 	
 	/**
 	 * 构造
@@ -89,9 +96,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		this.setFocusable(true);
 		
 		paint = new Paint();
-		paint.setColor(Color.CYAN);
 		paint.setStrokeWidth(5f);
 		
+		tipQueue = new ArrayList<String>();
 	}
 	
 	/**开始绘制*/
@@ -109,6 +116,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		tempBitmap.recycle();
 		
 		//画边框
+		paint.setColor(Color.CYAN);
 		canvas.drawLine(0, aboveHeight, appDate.getScreenWidth(), aboveHeight, paint);
 		canvas.drawLine(belowLeftWidth, aboveHeight, belowLeftWidth, appDate.getScreenHeight(), paint);
 		
@@ -193,7 +201,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		tempBitmap = Bitmap.createScaledBitmap(bitmap,gameTypes.getCellWidth()/4, gameTypes.getCellHeight()/4,true);
 		bitmap.recycle();
 		canvas.drawBitmap(tempBitmap, 5,aboveHeight+5, paint);
-		canvas.drawText(":21  <==>",5+tempBitmap.getWidth() , aboveHeight+5+10, paint);
+		canvas.drawText("我:"+(myPosition+1)+"  <==>",5+tempBitmap.getWidth() , aboveHeight+5+10, paint);
 		tempBitmap.recycle();
 		
 		//画我对手状态
@@ -204,20 +212,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		tempBitmap = Bitmap.createScaledBitmap(bitmap,gameTypes.getCellWidth()/4, gameTypes.getCellHeight()/4,true);
 		bitmap.recycle();
 		canvas.drawBitmap(tempBitmap, 5+tempBitmap.getWidth()+60,aboveHeight+5, paint);
-		canvas.drawText(":5",5+tempBitmap.getWidth()+60+tempBitmap.getWidth() , aboveHeight+5+10, paint);
+		canvas.drawText("机器:"+(opPosition+1)+"",5+tempBitmap.getWidth()+60+tempBitmap.getWidth() , aboveHeight+5+10, paint);
 		tempBitmap.recycle();
 		
 		
 		//画提示
-		canvas.drawText("遇到狼，退一步",5 , aboveHeight+5+10+20, paint);
+		float textSize = paint.getTextSize();
 		
-		canvas.drawText("你是好样的，进一步",5 , aboveHeight+5+10+20+20, paint);
-		
-		canvas.drawText("你是好样的，进两步",5 , aboveHeight+5+10+20+20+20, paint);
-		
-		canvas.drawText("你是好样的，进三步",5 , aboveHeight+5+10+20+20+20+20, paint);
-		
-		canvas.drawText("你是好样的，进四步",5 , aboveHeight+5+10+20+20+20+20+20, paint);
+		for(int i=0 ; i<tipQueue.size() ; i++){
+//			canvas.drawText("遇到狼，退一步"+i,5 , aboveHeight+5+textSize*(i+2), paint);tipPush
+			canvas.drawText(tipQueue.get(i),5 , aboveHeight+5+textSize*(i+2), paint);
+		}
 		
 		holder.unlockCanvasAndPost(canvas);
 		
@@ -287,32 +292,39 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 				while(true){
 					if(myPosition >= endPosition){ //到达终点
 						myPosition = endPosition;
+						tipPush("我"+gameDate.get(myPosition).getDesc()+":"+gameDate.get(myPosition).getGostep());
 						System.out.println("我胜出...");
 						break;
 					}
+					
 					cell = gameDate.get(myPosition);
 					if(cell.getType() == Types.TYPE_FORWARD){//向前
 						myPosition += cell.getGostep();
 						System.out.println(cell.getDesc()+":"+cell.getGostep());
+						tipPush("我"+gameDate.get(myPosition).getDesc()+":"+gameDate.get(myPosition).getGostep());
 					}else if(cell.getType() == Types.TYPE_BACK){//向后
 						myPosition -= cell.getGostep();
 						System.out.println(cell.getDesc()+":"+cell.getGostep());
 						if(myPosition <= 0){
 							myPosition = 0;
+							tipPush("我:回到起点");
 							System.out.println("回到了起点...");
 							break;
 						}
 					}else if(cell.getType() == Types.TYPE_PAUSE){//暂停一次
 						myIsPause = true;
 						System.out.println(cell.getDesc()+":"+cell.getGostep());
+						tipPush("我"+gameDate.get(myPosition).getDesc());
 						break;
 					}else if(cell.getType() == Types.TYPE_NON){//没事
 						System.out.println("没事.AA..");
 						break;
 					}else if(cell.getType() == Types.TYPE_BEGIN){//起点
 						System.out.println("回到了起点.AA..");
+						tipPush("我:回到起点");
 						break;
 					}else if(cell.getType() == Types.TYPE_END){//终点
+						tipPush("我"+gameDate.get(myPosition).getDesc()+":"+gameDate.get(myPosition).getGostep());
 						System.out.println("我胜出.AA..");
 						break;
 					}else{//异常类型
@@ -339,6 +351,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 				while(true){
 					if(opPosition >= endPosition){ //到达终点
 						opPosition = endPosition;
+						tipPush("对手:"+gameDate.get(opPosition).getDesc()+":"+gameDate.get(opPosition).getGostep());
 						System.out.println("对手胜出...");
 						break;
 					}
@@ -346,25 +359,30 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 					if(cell.getType() == Types.TYPE_FORWARD){//向前
 						opPosition += cell.getGostep();
 						System.out.println(cell.getDesc()+":对手"+cell.getGostep());
+						tipPush("对手:"+gameDate.get(opPosition).getDesc()+":"+gameDate.get(opPosition).getGostep());
 					}else if(cell.getType() == Types.TYPE_BACK){//向后
 						opPosition -= cell.getGostep();
 						System.out.println(cell.getDesc()+":对手"+cell.getGostep());
 						if(opPosition <= 0){
 							opPosition = 0;
 							System.out.println("对手回到了起点...");
+							tipPush("对手:回到起点");
 							break;
 						}
 					}else if(cell.getType() == Types.TYPE_PAUSE){//暂停一次
 						System.out.println(cell.getDesc()+":对手"+cell.getGostep());
+						tipPush("对手:"+gameDate.get(opPosition).getDesc());
 						break;
 					}else if(cell.getType() == Types.TYPE_NON){//没事
 						System.out.println("没事.BB..");
 						break;
 					}else if(cell.getType() == Types.TYPE_BEGIN){//起点
 						System.out.println("回到了起点.BB..");
+						tipPush("对手:回到起点");
 						break;
 					}else if(cell.getType() == Types.TYPE_END){//终点
-						System.out.println("我胜出.BB..");
+						System.out.println("对手胜出.BB..");
+						tipPush("对手:"+gameDate.get(opPosition).getDesc()+":"+gameDate.get(opPosition).getGostep());
 						break;
 					}else{//异常类型
 						break;
@@ -387,6 +405,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 			
 		}
 		
+	}
+	
+	/**
+	 * 提示入队
+	 * @param tip 提示
+	 */
+	private void tipPush(String tip){
+		if(tipQueue.size() >= allowTipRows)
+			tipQueue.remove(0);
+		tipQueue.add(tipQueue.size(), tip);
 	}
 	
 	/**
@@ -428,12 +456,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		aboveHeight = (int)(height * 0.8D);
 		belowLeftWidth = (int)(width * 0.6D);
 		
+		belowHeight = appDate.getScreenHeight() - aboveHeight;
+		belowRightWidth = appDate.getScreenWidth() - belowLeftWidth;
+		
 		gameTypes = new GameTypes(width, aboveHeight);
 		cellList = gameTypes.getCellList();//获取所有格数据
 		gameDate= gameTypes.getGameByType();
 		
 		endPosition = gameDate.size() - 1;
 		endPosition = endPosition>0?endPosition:0;
+		
+		//画提示
+		float textSize = paint.getTextSize();
+		//一列可容纳多少行字
+		allowTipRows = (int)(belowHeight/textSize);
+		allowTipRows -=2;//减一行用来做显示状态 一行分界线
 		
 		new DrawThread().start();
 	}
